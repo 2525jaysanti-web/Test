@@ -1,0 +1,19 @@
+{
+  "name": "takeoff-pro",
+  "version": "1.0.0",
+  "description": "Browser-based quantity takeoff and estimating for construction contract drawings",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/*.test.js",
+    "sample": "node scripts/make-sample-pdf.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "pdfjs-dist": "4.10.38"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TakeOff Pro</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <img src="favicon.svg" alt="" width="22" height="22">
+      <span>TakeOff Pro</span>
+    </div>
+    <input id="projectName" class="project-name" aria-label="Project name" spellcheck="false">
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-view="takeoff" aria-selected="true">Takeoff</button>
+      <button role="tab" data-view="estimate">Estimate</button>
+      <button role="tab" data-view="project">Project</button>
+    </nav>
+    <div class="topbar-actions">
+      <button id="btnNew" title="Start a new project">New</button>
+      <button id="btnOpen" title="Open a project file (.takeoff.json)">Open…</button>
+      <button id="btnExport" title="Save project with drawings to a file">Save As…</button>
+      <input type="file" id="openInput" accept=".json,application/json" hidden>
+      <span id="saveState" class="save-state"></span>
+    </div>
+  </header>
+
+  <!-- ============================== TAKEOFF ============================== -->
+  <main id="view-takeoff" class="view takeoff">
+    <aside class="sidebar left">
+      <section class="panel">
+        <header>
+          <h2>Drawings</h2>
+          <button id="btnAddDrawing" class="primary small" title="Add PDF or image drawings">+ Add</button>
+          <input type="file" id="drawingInput" accept="application/pdf,.pdf,image/png,image/jpeg,image/webp" multiple hidden>
+        </header>
+        <ul id="sheetList" class="list sheets"></ul>
+        <p id="sheetEmpty" class="empty">Add PDF or image drawings to begin. Multi-page PDFs become one sheet per page.</p>
+      </section>
+      <section class="panel grow">
+        <header>
+          <h2>Conditions</h2>
+          <button id="btnAddCondition" class="primary small" title="Add a takeoff condition">+ New</button>
+        </header>
+        <ul id="conditionList" class="list conditions"></ul>
+        <p id="conditionEmpty" class="empty">Conditions are the items you measure — walls, slabs, doors… Create one, select it, then click on the drawing.</p>
+      </section>
+    </aside>
+
+    <section class="workspace">
+      <div class="toolbar" role="toolbar">
+        <div class="group" id="toolGroup">
+          <button data-tool="pan" title="Pan (V) — or hold Space / middle mouse">✋ Pan</button>
+          <button data-tool="select" title="Select & edit (S)">⬚ Select</button>
+          <button data-tool="measure" title="Measure with the active condition (M)">📐 Measure</button>
+          <button data-tool="calibrate" title="Calibrate scale from a known dimension (K)">📏 Calibrate</button>
+        </div>
+        <div class="group">
+          <label class="toggle" title="Area measurements subtract from the total (D)"><input type="checkbox" id="chkDeduct"> Deduct</label>
+          <label class="toggle"><input type="checkbox" id="chkLabels" checked> Labels</label>
+        </div>
+        <div class="group">
+          <button id="btnUndo" title="Undo (Ctrl+Z)">↶</button>
+          <button id="btnRedo" title="Redo (Ctrl+Y)">↷</button>
+        </div>
+        <div class="group">
+          <button id="btnZoomOut" title="Zoom out (-)">−</button>
+          <span id="zoomLabel" class="zoom-label">100%</span>
+          <button id="btnZoomIn" title="Zoom in (+)">+</button>
+          <button id="btnFit" title="Fit sheet (F)">Fit</button>
+        </div>
+        <div class="group scale-group">
+          <label for="scaleSelect">Scale</label>
+          <select id="scaleSelect"></select>
+          <label id="dpiWrap" class="dpi" hidden title="Resolution of the scanned image, used by preset scales">DPI <input id="dpiInput" type="number" min="10" max="2400" step="1"></label>
+          <button id="btnScaleAll" class="small" title="Copy this sheet's scale to every sheet">Apply to all</button>
+        </div>
+      </div>
+      <div id="viewport" class="viewport" tabindex="0">
+        <div id="viewportEmpty" class="viewport-empty">
+          <p><strong>No drawing open.</strong></p>
+          <p>Add PDF or image drawings on the left, or drop files here.</p>
+        </div>
+      </div>
+      <footer class="statusbar">
+        <span id="statusDraft"></span>
+        <span class="spacer"></span>
+        <span id="statusActive"></span>
+        <span id="statusScale"></span>
+        <span id="statusCursor"></span>
+      </footer>
+    </section>
+
+    <aside class="sidebar right">
+      <section class="panel" id="selectionPanel" hidden>
+        <header><h2>Selected measurement</h2></header>
+        <div id="selectionBody" class="selection"></div>
+      </section>
+      <section class="panel grow">
+        <header>
+          <h2>Quantities</h2>
+          <label class="toggle small"><input type="checkbox" id="chkSheetOnly"> This sheet</label>
+        </header>
+        <table class="qty-table">
+          <thead><tr><th>Condition</th><th class="num">Qty</th><th>Unit</th></tr></thead>
+          <tbody id="qtyBody"></tbody>
+        </table>
+      </section>
+      <section class="panel help">
+        <header><h2>Shortcuts</h2></header>
+        <dl class="shortcuts">
+          <dt>Click</dt><dd>Add point / count</dd>
+          <dt>Double-click</dt><dd>Finish line or area (or Enter / right-click)</dd>
+          <dt>Shift</dt><dd>Snap to 45°</dd>
+          <dt>Backspace</dt><dd>Remove last point</dd>
+          <dt>Esc</dt><dd>Cancel</dd>
+          <dt>Wheel</dt><dd>Zoom · Space-drag to pan</dd>
+          <dt>Del</dt><dd>Delete selected</dd>
+          <dt>PgUp / PgDn</dt><dd>Previous / next sheet</dd>
+        </dl>
+      </section>
+    </aside>
+  </main>
+
+  <!-- ============================== ESTIMATE ============================== -->
+  <main id="view-estimate" class="view estimate" hidden>
+    <div class="estimate-head">
+      <div>
+        <h1 id="estTitle">Estimate</h1>
+        <p id="estMeta" class="muted"></p>
+      </div>
+      <div class="actions">
+        <button id="btnCsv">Export CSV</button>
+        <button id="btnPrint">Print / PDF</button>
+      </div>
+    </div>
+    <div id="estWarnings"></div>
+    <div class="table-wrap">
+      <table class="estimate-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th class="num">Measured</th>
+            <th class="num">Qty</th>
+            <th>Unit</th>
+            <th class="num">Waste %</th>
+            <th class="num">Order qty</th>
+            <th class="num">Material $/u</th>
+            <th class="num">Labor $/u</th>
+            <th class="num">Equip $/u</th>
+            <th class="num">Material</th>
+            <th class="num">Labor</th>
+            <th class="num">Equipment</th>
+            <th class="num">Total</th>
+          </tr>
+        </thead>
+        <tbody id="estBody"></tbody>
+      </table>
+    </div>
+    <div class="summary-grid">
+      <section class="card">
+        <h2>Markups</h2>
+        <form id="markupForm" class="markups">
+          <label>Sales tax on material <span><input name="taxPct" type="number" step="0.01" min="0"> %</span></label>
+          <label>Overhead <span><input name="overheadPct" type="number" step="0.01" min="0"> %</span></label>
+          <label>Profit <span><input name="profitPct" type="number" step="0.01" min="0"> %</span></label>
+          <label>Contingency <span><input name="contingencyPct" type="number" step="0.01" min="0"> %</span></label>
+          <label>Bond <span><input name="bondPct" type="number" step="0.01" min="0"> %</span></label>
+        </form>
+      </section>
+      <section class="card">
+        <h2>Bid summary</h2>
+        <table id="summaryTable" class="summary"></table>
+      </section>
+    </div>
+  </main>
+
+  <!-- ============================== PROJECT ============================== -->
+  <main id="view-project" class="view project" hidden>
+    <form id="projectForm" class="card project-form">
+      <h2>Project information</h2>
+      <label>Project name <input name="name" required></label>
+      <label>Client / owner <input name="client"></label>
+      <label>Location <input name="location"></label>
+      <div class="row">
+        <label>Bid date <input name="bidDate" type="date"></label>
+        <label>Estimator <input name="estimator"></label>
+      </div>
+      <label>Notes / exclusions <textarea name="notes" rows="6"></textarea></label>
+    </form>
+    <section class="card">
+      <h2>Storage</h2>
+      <p class="muted">Projects auto-save in this browser (IndexedDB), including drawings. Use <em>Save As…</em> to create a portable
+        <code>.takeoff.json</code> file with drawings embedded that you can back up or share, and <em>Open…</em> to load one.</p>
+      <h3>Projects in this browser</h3>
+      <ul id="projectList" class="list projects"></ul>
+    </section>
+  </main>
+
+  <!-- ============================== DIALOGS ============================== -->
+  <dialog id="conditionDialog">
+    <form method="dialog" id="conditionForm" class="dialog-form">
+      <h2 id="conditionDialogTitle">New condition</h2>
+      <label class="library">Start from library
+        <select id="assemblySelect"><option value="">— Blank condition —</option></select>
+      </label>
+      <label>Name <input name="name" required></label>
+      <div class="row">
+        <label>Division <select name="division" id="divisionSelect"></select></label>
+        <label class="narrow">Color <input name="color" type="color"></label>
+      </div>
+      <div class="row">
+        <label>Measure as
+          <select name="type">
+            <option value="linear">Linear (polyline)</option>
+            <option value="area">Area (polygon)</option>
+            <option value="count">Count (points)</option>
+          </select>
+        </label>
+        <label>Price per <select name="unit"></select></label>
+      </div>
+      <p id="unitHelp" class="muted small"></p>
+      <div class="row dims">
+        <label data-dim="heightFt">Height (ft) <input name="heightFt" type="number" step="any" min="0"></label>
+        <label data-dim="widthIn">Width (in) <input name="widthIn" type="number" step="any" min="0"></label>
+        <label data-dim="depthIn">Depth (in) <input name="depthIn" type="number" step="any" min="0"></label>
+        <label data-dim="thicknessIn">Thickness (in) <input name="thicknessIn" type="number" step="any" min="0"></label>
+      </div>
+      <div class="row">
+        <label>Waste % <input name="wastePct" type="number" step="any" min="0"></label>
+        <label>Material $/unit <input name="material" type="number" step="any" min="0"></label>
+        <label>Labor $/unit <input name="labor" type="number" step="any" min="0"></label>
+        <label>Equip $/unit <input name="equipment" type="number" step="any" min="0"></label>
+      </div>
+      <label>Notes <textarea name="notes" rows="2"></textarea></label>
+      <p class="muted small">Library prices are illustrative placeholders — replace them with your own costs.</p>
+      <menu>
+        <button value="cancel" formnovalidate>Cancel</button>
+        <button value="ok" class="primary">Save</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <dialog id="calibrateDialog">
+    <form method="dialog" class="dialog-form narrow">
+      <h2>Calibrate scale</h2>
+      <p class="muted">You picked a line <strong id="calUnits"></strong> sheet units long. Enter its real length.</p>
+      <label>Known length <input name="length" id="calLength" placeholder="e.g. 20'  or  12'-6&quot;  or  3.5m" required autocomplete="off"></label>
+      <p id="calError" class="error" hidden>Could not read that length.</p>
+      <label class="toggle"><input type="checkbox" name="all"> Apply to all sheets from this file</label>
+      <menu>
+        <button value="cancel" formnovalidate>Cancel</button>
+        <button value="ok" class="primary">Set scale</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="dropHint" class="drop-hint" hidden>Drop drawings to add them</div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

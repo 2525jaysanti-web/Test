@@ -1,0 +1,61 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 2592 1728] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 1079 >>
+stream
+1 w
+36 36 2520 1656 re S
+2196 36 360 144 re S
+BT /F1 14 Tf 2212 140 Td (SAMPLE OFFICE - FLOOR PLAN) Tj ET
+BT /F1 10 Tf 2212 110 Td (SCALE: 1/4" = 1'-0") Tj ET
+BT /F1 36 Tf 2212 60 Td (A101) Tj ET
+2 w
+216.00 216.00 1440.00 900.00 re S
+228.06 228.06 1416.06 876.06 re S
+1 w
+756.00 228.06 m 756.00 1103.94 l S
+228.06 666.00 m 756.00 666.00 l S
+756.00 756.00 m 1643.94 756.00 l S
+1206.00 756.00 m 1206.00 1103.94 l S
+729.00 369.00 54.00 54.00 re S
+459.00 639.00 54.00 54.00 re S
+999.00 729.00 54.00 54.00 re S
+1359.00 729.00 54.00 54.00 re S
+216.00 108.00 m 1656.00 108.00 l S
+216.00 90.00 m 216.00 126.00 l S
+1656.00 90.00 m 1656.00 126.00 l S
+BT /F1 12 Tf 900 117 Td (80'-0") Tj ET
+108.00 216.00 m 108.00 1116.00 l S
+BT /F1 12 Tf 18 666 Td (50'-0") Tj ET
+BT /F1 14 Tf 396 432 Td (OPEN OFFICE) Tj ET
+BT /F1 14 Tf 396 882 Td (CONFERENCE) Tj ET
+BT /F1 14 Tf 1116 486 Td (WORK AREA) Tj ET
+BT /F1 14 Tf 936 936 Td (OFFICE 1) Tj ET
+BT /F1 14 Tf 1368 936 Td (OFFICE 2) Tj ET
+BT /F1 12 Tf 80 1648 Td (Plan dimensions: building 80'-0" x 50'-0". Use the bottom dimension to calibrate.) Tj ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000243 00000 n 
+0000001374 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1444
+%%EOF
